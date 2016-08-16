@@ -5,7 +5,7 @@ import sys
 
 
 def send_msg(msg):
-    infos = socket.getaddrinfo('127.0.0.1', 5000)
+    infos = socket.getaddrinfo('127.0.0.1', 5005)
     stream_info = [i for i in infos if i[1] == socket.SOCK_STREAM][0]
     client = socket.socket(*stream_info[:3])
     client.connect(stream_info[-1])
@@ -16,9 +16,9 @@ def send_msg(msg):
         part = client.recv(buffer_length)
         print(part.decode('utf-8'))
         if len(part) < buffer_length:
-            message_complete = True
+            reply_complete = True
     client.close()
-    print(part)
+    print('lookie: ', part)
 
 
 def main():
