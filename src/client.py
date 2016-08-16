@@ -1,11 +1,14 @@
+# -*- coding: utf-8 -*-
 import socket
 import sys
+
 
 def init_connection():
     infos = socket.getaddrinfo('127.0.0.1', 5019)
     stream_info = [i for i in infos if i[1] == socket.SOCK_STREAM][0]
     client = socket.socket(*stream_info[:3])
     return client, stream_info
+
 
 def send_msg(msg):
     client, stream_info = init_connection()
