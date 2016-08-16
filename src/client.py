@@ -27,11 +27,12 @@ def send_msg(msg):
 
     client.close()
     print('recvd: ', res)
+    return res
 
 
 def main():
     if len(sys.argv) != 2:
-        print(u'usage: python3 client.py <message to send>')
+        print(u'usage: python3 client.py "message to send"')
         sys.exit(1)
     else:
         send_msg(sys.argv[1])
