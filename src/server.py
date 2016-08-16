@@ -2,13 +2,13 @@
 import socket
 
 
-while True:
-    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM, socket.IPPROTO_TCP)
-    address = ('127.0.0.1', 5019)
-    server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    server.bind(address)
+server = socket.socket(socket.AF_INET, socket.SOCK_STREAM, socket.IPPROTO_TCP)
+address = ('127.0.0.1', 5019)
+server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+server.bind(address)
+server.listen(1)
 
-    server.listen(1)
+while True:
     conn, addr = server.accept()
 
     buffer_length = 8
@@ -17,12 +17,10 @@ while True:
     msg = ''
     while not message_complete:
         part = conn.recv(buffer_length)
-        msg += part.decode('utf-8')
+        msg += part.decode('utf8')
         if len(part) < buffer_length or not part:
             message_complete = True
-            break
 
     print('recvd:', msg)
-    conn.sendall(msg.encode('utf-8'))
-    conn.shutdown(1)
+    conn.sendall(msg.encode('utf8'))
     conn.close()
