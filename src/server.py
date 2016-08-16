@@ -2,7 +2,7 @@ import socket
 import sys
 
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM, socket.IPPROTO_TCP)
-address = ('127.0.0.1', 5005)
+address = ('127.0.0.1', 5019)
 server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 server.bind(address)
 
@@ -15,16 +15,12 @@ message_complete = False
 msg = ''
 while not message_complete:
     part = conn.recv(buffer_length)
-    print(part.decode('utf-8'))
-    if len(part) < buffer_length or len(part) % buffer_length != 0:
-        print('in if')
+    msg += part.decode('utf-8')
+    if len(part) < buffer_length or not part:
         message_complete = True
         break
-    msg += part.decode('utf-8')
 
-print(msg)
-print('got here')
+print('recvd:', msg)
 conn.sendall(msg.encode('utf-8'))
-print('sent')
+conn.shutdown(1)
 conn.close()
-server.close()
