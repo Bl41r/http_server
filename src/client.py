@@ -26,18 +26,21 @@ def send_msg(msg):
 
     client.shutdown(socket.SHUT_WR)
     reply_complete = False
-    res = ''
+    res = b''
     buffer_length = 8
 
     while not reply_complete:
         part = client.recv(buffer_length)
-        part = part.decode('utf8')
         res += part
         if len(part) < buffer_length:
             reply_complete = True
 
     client.close()
     print('recv\'d: ', res)
+    try:
+        res = res.decode('utf8')
+    except:
+        return res
     return res
 
 
