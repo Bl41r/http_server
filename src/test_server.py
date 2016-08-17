@@ -3,11 +3,11 @@ import pytest
 import client
 
 MSG_TABLE = [
-    (u'morethan8', u'morethan8'),
-    (u'eight888', u'eight888'),
-    (u'less8', u'less8'),
-    ('éyçño', u'éyçño'),
-    (u'', u''),
+    ('morethan8', 'HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\nmorethan8'),
+    ('eight888', 'HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\neight888'),
+    ('less8', 'HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\nless8'),
+    ('éyçño', 'HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\néyçño'),
+    ('', 'HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\n'),
 ]
 
 
