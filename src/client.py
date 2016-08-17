@@ -39,8 +39,12 @@ def send_msg(msg):
     print('recv\'d: ', res)
     try:
         res = res.decode('utf8')
+        print('in try')
+        print(type(res))
     except:
+        print('except', type(res))
         return res
+    print('before return', type(res), res)
     return res
 
 
