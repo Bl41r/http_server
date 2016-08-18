@@ -2,6 +2,14 @@
 import socket
 import sys
 
+port = 5010
+
+def split_headers(res):
+    pass
+
+def make_GET(url):
+    # GET /path/file.html HTTP/1.1
+    return 'GET ' + url + ' HTTP/1.1\r\nHost: ' + url + '\r\n\r\n'
 
 def init_connection(ip, port):
     infos = socket.getaddrinfo(ip, port)
@@ -15,14 +23,16 @@ def init_connection(ip, port):
         return client, stream_info
 
 
-def send_msg(msg):
-    client, stream_info = init_connection('127.0.0.1', 5000)
+def send_msg():
+    client, stream_info = init_connection('127.0.0.1', port)
     client.connect(stream_info[-1])
 
-    try:
-        client.sendall(msg.encode('utf8'))
-    except UnicodeDecodeError:
-        client.sendall(msg)
+    #try:
+    #    client.sendall(msg.encode('utf8'))
+    #except UnicodeDecodeError:
+    #    client.sendall(msg)
+
+    client.sendall(make_GET('localhost:5001').encode('utf8'))
 
     client.shutdown(socket.SHUT_WR)
     reply_complete = False
@@ -39,21 +49,18 @@ def send_msg(msg):
     print('recv\'d: ', res)
     try:
         res = res.decode('utf8')
-        print('in try')
-        print(type(res))
     except:
-        print('except', type(res))
-        return res
-    print('before return', type(res), res)
+        pass
+    print('final:', res)
     return res
 
 
 def main():
-    if len(sys.argv) != 2:
-        print(u'usage: python3 client.py "message to send"')
+    if len(sys.argv) != 1:
+        print(u'usage: python3 client.py')
         sys.exit(1)
     else:
-        send_msg(sys.argv[1])
+        send_msg()
 
 if __name__ == '__main__':
     main()
