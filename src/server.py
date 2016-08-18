@@ -3,6 +3,7 @@ import socket
 
 port = 5010
 
+
 def response_ok():
     return b"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\nIf you want my body and you think I'm sexy come on sugar let me know\r\n\r\n"
 
@@ -10,18 +11,18 @@ def response_ok():
 def response_error(msg):
     return "HTTP/1.1 500 Internal Server Error\r\nNO YOU SUCK IT: " + msg + "\r\n\r\n"
 
+
 def parse_request(req):
     # GET localhost:5001 HTTP/1.1\r\nHost: localhost:5001\r\n\r\n
-    print('in parse req func')
     req = req.split()
-    proto = req[2].split("\\")[0]
-    print('proto:', proto)
-    print('req:', req[0])
+    proto = req[2]
+    host = req[3] + ' ' + req[4]
     if req[0] != 'GET':
         return response_error('get')
     if proto != 'HTTP/1.1':
-        print('proto: ', proto, ' cmp: HTTP/1.1')
         return response_error('protocol')
+    if host != 'Host: localhost:5001':
+        return response_error('host')
     return 'Successfully parsed'
 
 
@@ -48,7 +49,7 @@ while True:
     if msg == 'suck it':
         msg = response_error()
     else:
-        print('parse', parse_request(msg))
+        parse_request(msg)
         msg = response_ok()
     conn.sendall(msg)
     conn.close()

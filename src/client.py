@@ -4,12 +4,15 @@ import sys
 
 port = 5010
 
+
 def split_headers(res):
     pass
+
 
 def make_GET(url):
     # GET /path/file.html HTTP/1.1
     return 'GET ' + url + ' HTTP/1.1\r\nHost: ' + url + '\r\n\r\n'
+
 
 def init_connection(ip, port):
     infos = socket.getaddrinfo(ip, port)
