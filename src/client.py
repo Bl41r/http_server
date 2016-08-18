@@ -6,7 +6,23 @@ port = 5010
 
 
 def split_headers(res):
-    pass
+    # HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\nIf you want my body and you think I'm sexy come on sugar let me know\r\n\r\n"
+    try:
+        res = res.decode('utf8')
+    except:
+        pass    # need to find  exception here
+    header = res.split('\r\n\r\n')[0]
+    body = res.split('\r\n\r\n')[1]
+    status = header.split('\r\n')[0]
+    header = header.split('\r\n')[1:]
+    headers_split = [h.split(':', 1) for h in header]
+    header_dict = {key.lower(): val.strip() for key, val in headers_split}
+    print()
+    print('split headers returns: ', (status, header_dict, body))
+    print()
+    return (status, header_dict, body)
+
+
 
 
 def make_GET(url):
@@ -50,11 +66,14 @@ def send_msg():
 
     client.close()
     print('recv\'d: ', res)
+    split_headers(res)  # here to test
     try:
         res = res.decode('utf8')
     except:
         pass
-    print('final:', res)
+    print('final:')
+    print('--------')
+    print(res)
     return res
 
 
