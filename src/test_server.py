@@ -24,10 +24,11 @@ def test_send_msg(msg, result):
 
 @pytest.mark.parametrize('a_string, a_type', STRING_TABLE)
 def test_force_unicode(a_string, a_type):
+    """Test type is forced to unicode"""
     assert type(client.force_unicode(a_string, type(u''))) is type(u'')
 
 
 def test_main():
-    """Test main call without message exits system"""
+    """Test main cal without message exits system"""
     with pytest.raises(SystemExit):
         client.main()
