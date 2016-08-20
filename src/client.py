@@ -7,7 +7,7 @@ def init_connection(ip, port):
     infos = socket.getaddrinfo(ip, port)
     try:
         stream_info = [i for i in infos if i[1] == socket.SOCK_STREAM][0]
-    except IndexError:
+    except IndexError:  # pragma: no cover
         print('Error aquiring stream_info.')
         sys.exit(1)
     else:
@@ -16,13 +16,14 @@ def init_connection(ip, port):
 
 
 def send_msg(msg):
-    client, stream_info = init_connection('127.0.0.1', 5002)
+    if sys.version_info.major == 3:
+        text_type = str
+    else:   # pragma: no cover
+        text_type = type(u'')
+    msg = force_unicode(msg, text_type)
+    client, stream_info = init_connection('127.0.0.1', 5004)
     client.connect(stream_info[-1])
-
-    try:
-        client.sendall(msg.encode('utf8'))
-    except UnicodeDecodeError:
-        client.sendall(msg)
+    client.sendall(msg.encode('utf8'))
 
     client.shutdown(socket.SHUT_WR)
     reply_complete = False
@@ -37,14 +38,7 @@ def send_msg(msg):
 
     client.close()
     print('recv\'d: ', res)
-    try:
-        res = res.decode('utf8')
-        print('in try')
-        print(type(res))
-    except:
-        print('except', type(res))
-        return res
-    print('before return', type(res), res)
+    res = res.decode('utf8')
     return res
 
 
@@ -58,12 +52,8 @@ def main():
     if len(sys.argv) != 2:
         print(u'usage: python3 client.py "message to send"')
         sys.exit(1)
-    else:
-        if sys.version_info.major == 3:
-            text_type = str
-        else:   # pragma: no cover
-            text_type = type(u'')
-        send_msg(force_unicode(sys.argv[1], text_type))
+    else:   # pragma: no cover
+        send_msg(sys.argv[1])
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     main()
