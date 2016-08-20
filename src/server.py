@@ -1,6 +1,14 @@
 # -*- coding: utf-8 -*-
 import socket
 
+
+def response_ok():
+    return b"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\n"
+
+
+def response_error():
+    return b"HTTP/1.1 500 Internal Server Error\r\nNO YOU SUCK IT\r\n\r\n"
+
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM, socket.IPPROTO_TCP)
 address = ('127.0.0.1', 5004)
 server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -21,5 +29,9 @@ while True:
             message_complete = True
 
     print('recvd:', msg)
-    conn.sendall(msg.encode('utf8'))
+    if msg == 'suck it':
+        msg = response_error()
+    else:
+        msg = response_ok() + msg.encode('utf8')
+    conn.sendall(msg)
     conn.close()

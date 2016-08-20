@@ -21,6 +21,7 @@ def send_msg(msg):
     else:   # pragma: no cover
         text_type = type(u'')
     msg = force_unicode(msg, text_type)
+
     client, stream_info = init_connection('127.0.0.1', 5004)
     client.connect(stream_info[-1])
     client.sendall(msg.encode('utf8'))

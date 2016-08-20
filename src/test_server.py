@@ -3,15 +3,15 @@ import pytest
 import client
 
 MSG_TABLE = [
-    ('morethan8', 'morethan8'),
-    ('eight888', 'eight888'),
-    ('less8', 'less8'),
-    ('éyçño', u'éyçño'),
-    ('', ''),
+    ('morethan8', 'HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\nmorethan8'),
+    ('eight888', 'HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\neight888'),
+    ('less8', 'HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\nless8'),
+    ('éyçño', 'HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\n' + u'éyçño'),
+    ('', 'HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\n'),
 ]
 STRING_TABLE = [
     ('rodstewartisagreatsinger', type(u'')),
-    (b'alsdkfj;sahgaeofljds;lghaksjfeijafghdlsfj', type(u'')),
+    (b'eiaojfa;eijfa;lkvnjknzvjkhfeu', type(u'')),
     ('éyçño', type(u'')),
 ]
 
