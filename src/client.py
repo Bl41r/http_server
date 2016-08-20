@@ -2,7 +2,7 @@
 import socket
 import sys
 
-port = 5002
+port = 5003
 
 
 def split_headers(res):
@@ -37,7 +37,6 @@ def init_connection(ip, port):
 def send_msg():
     client, stream_info = init_connection('127.0.0.1', port)
     client.connect(stream_info[-1])
-
     client.sendall(make_GET('localhost:5001').encode('utf8'))
 
     client.shutdown(socket.SHUT_WR)
@@ -58,12 +57,18 @@ def send_msg():
     return res
 
 
+def force_unicode(a_string, text_type):
+    if not isinstance(a_string, text_type):
+        return a_string.decode('utf-8')
+    return a_string
+
+
 def main():
     if len(sys.argv) != 1:
         print(u'usage: python3 client.py')
         sys.exit(1)
-    else: # pragma: no cover
-        return send_msg()
+    else:   # pragma: no cover
+        send_msg()
 
-if __name__ == '__main__': # pragma: no cover
+if __name__ == '__main__':  # pragma: no cover
     main()
