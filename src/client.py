@@ -16,7 +16,12 @@ def init_connection(ip, port):
 
 
 def send_msg(msg):
-    client, stream_info = init_connection('127.0.0.1', 5002)
+    if sys.version_info.major == 3:
+        text_type = str
+    else:
+        text_type = type(u'')
+    msg = force_unicode(msg, text_type)
+    client, stream_info = init_connection('127.0.0.1', 5003)
     client.connect(stream_info[-1])
     client.sendall(msg.encode('utf8'))
 
@@ -48,12 +53,7 @@ def main():
         print(u'usage: python3 client.py "message to send"')
         sys.exit(1)
     else:   # pragma: no cover
-        if sys.version_info.major == 3:
-            text_type = str
-        else:
-            text_type = type(u'')
-
-        send_msg(force_unicode(sys.argv[1], text_type))
+        send_msg(sys.argv[1])
 
 if __name__ == '__main__':  # pragma: no cover
     main()
