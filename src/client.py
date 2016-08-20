@@ -2,54 +2,41 @@
 import socket
 import sys
 
-port = 5010
+port = 5002
 
 
 def split_headers(res):
-    # HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\nIf you want my body and you think I'm sexy come on sugar let me know\r\n\r\n"
     try:
         res = res.decode('utf8')
-    except:
-        pass    # need to find  exception here
+    except AttributeError:
+        pass
     header = res.split('\r\n\r\n')[0]
-    body = res.split('\r\n\r\n')[1]
+    if len(res.split('\r\n\r\n')) > 1:
+        body = res.split('\r\n\r\n')[1]
+    else:
+        body = ""
     status = header.split('\r\n')[0]
     header = header.split('\r\n')[1:]
     headers_split = [h.split(':', 1) for h in header]
     header_dict = {key.lower(): val.strip() for key, val in headers_split}
-    print()
     print('split headers returns: ', (status, header_dict, body))
-    print()
     return (status, header_dict, body)
 
 
-
-
 def make_GET(url):
-    # GET /path/file.html HTTP/1.1
-    return 'GET ' + url + ' HTTP/1.1\r\nHost: ' + url + '\r\n\r\n'
+    return 'GET / HTTP/1.1\r\nHost: ' + url + '\r\n\r\n'
 
 
 def init_connection(ip, port):
     infos = socket.getaddrinfo(ip, port)
-    try:
-        stream_info = [i for i in infos if i[1] == socket.SOCK_STREAM][0]
-    except IndexError:
-        print('Error aquiring stream_info.')
-        sys.exit(1)
-    else:
-        client = socket.socket(*stream_info[:3])
-        return client, stream_info
+    stream_info = [i for i in infos if i[1] == socket.SOCK_STREAM][0]
+    client = socket.socket(*stream_info[:3])
+    return client, stream_info
 
 
 def send_msg():
     client, stream_info = init_connection('127.0.0.1', port)
     client.connect(stream_info[-1])
-
-    #try:
-    #    client.sendall(msg.encode('utf8'))
-    #except UnicodeDecodeError:
-    #    client.sendall(msg)
 
     client.sendall(make_GET('localhost:5001').encode('utf8'))
 
@@ -66,14 +53,8 @@ def send_msg():
 
     client.close()
     print('recv\'d: ', res)
-    split_headers(res)  # here to test
-    try:
-        res = res.decode('utf8')
-    except:
-        pass
-    print('final:')
-    print('--------')
-    print(res)
+    split_headers(res)
+    res = res.decode('utf8')
     return res
 
 
@@ -81,8 +62,8 @@ def main():
     if len(sys.argv) != 1:
         print(u'usage: python3 client.py')
         sys.exit(1)
-    else:
-        send_msg()
+    else: # pragma: no cover
+        return send_msg()
 
-if __name__ == '__main__':
+if __name__ == '__main__': # pragma: no cover
     main()
