@@ -16,7 +16,7 @@ def init_connection(ip, port):
 
 
 def send_msg(msg):
-    client, stream_info = init_connection('127.0.0.1', 5000)
+    client, stream_info = init_connection('127.0.0.1', 5002)
     client.connect(stream_info[-1])
 
     try:
@@ -48,12 +48,22 @@ def send_msg(msg):
     return res
 
 
+def force_unicode(a_string, text_type):
+    if not isinstance(a_string, text_type):
+        return a_string.decode('utf-8')
+    return a_string
+
+
 def main():
     if len(sys.argv) != 2:
         print(u'usage: python3 client.py "message to send"')
         sys.exit(1)
     else:
-        send_msg(sys.argv[1])
+        if sys.version_info.major == 3:
+            text_type = str
+        else:   # pragma: no cover
+            text_type = type(u'')
+        send_msg(force_unicode(sys.argv[1], text_type))
 
 if __name__ == '__main__':
     main()

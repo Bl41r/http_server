@@ -3,11 +3,11 @@ import pytest
 import client
 
 MSG_TABLE = [
-    (u'morethan8', u'morethan8'),
-    (u'eight888', u'eight888'),
-    (u'less8', u'less8'),
-    ('éyçño', u'éyçño'),
-    (u'', u''),
+    ('morethan8', 'morethan8'),
+    ('eight888', 'eight888'),
+    ('less8', 'less8'),
+    ('éyçño', 'éyçño'),
+    ('', ''),
 ]
 
 
