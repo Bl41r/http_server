@@ -10,9 +10,9 @@ MSG_TABLE = [
     ('', ''),
 ]
 STRING_TABLE = [
-    ('rodstewartisagreatsinger', type(u'')),
-    (b'alsdkfj;sahgaeofljds;lghaksjfeijafghdlsfj', type(u'')),
-    ('éyçño', type(u'')),
+    ('rodstewartisagreatsinger'),
+    (b'alsdkfj;sahgaeofljds;lghaksjfeijafghdlsfj'),
+    ('éyçño'),
 ]
 
 
@@ -22,10 +22,10 @@ def test_send_msg(msg, result):
     assert client.send_msg(msg) == result
 
 
-@pytest.mark.parametrize('a_string, a_type', STRING_TABLE)
-def test_force_unicode(a_string, a_type):
+@pytest.mark.parametrize('a_string', STRING_TABLE)
+def test_force_unicode(a_string):
     """Test type is forced to unicode"""
-    assert type(client.force_unicode(a_string, type(u''))) is type(u'')
+    assert type(client.force_unicode(a_string)) is type(u'')
 
 
 def test_main():
