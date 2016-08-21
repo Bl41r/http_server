@@ -3,6 +3,16 @@ import socket
 import sys
 
 
+def force_unicode(a_string):
+    if sys.version_info.major == 3:
+        text_type = str
+    else:   # pragma: no cover
+        text_type = type(u'')
+    if not isinstance(a_string, text_type):
+        return a_string.decode('utf-8')
+    return a_string
+
+
 def init_connection(ip, port):
     infos = socket.getaddrinfo(ip, port)
     try:
@@ -12,18 +22,14 @@ def init_connection(ip, port):
         sys.exit(1)
     else:
         client = socket.socket(*stream_info[:3])
-        return client, stream_info
+        client.connect(stream_info[-1])
+        return client
 
 
 def send_msg(msg):
-    if sys.version_info.major == 3:
-        text_type = str
-    else:   # pragma: no cover
-        text_type = type(u'')
-    msg = force_unicode(msg, text_type)
+    msg = force_unicode(msg)
 
-    client, stream_info = init_connection('127.0.0.1', 5004)
-    client.connect(stream_info[-1])
+    client = init_connection('127.0.0.1', 5005)
     client.sendall(msg.encode('utf8'))
 
     client.shutdown(socket.SHUT_WR)
@@ -40,13 +46,8 @@ def send_msg(msg):
     client.close()
     print('recv\'d: ', res)
     res = res.decode('utf8')
+    print('decoded message: ', res)
     return res
-
-
-def force_unicode(a_string, text_type):
-    if not isinstance(a_string, text_type):
-        return a_string.decode('utf-8')
-    return a_string
 
 
 def main():
