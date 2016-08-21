@@ -2,26 +2,6 @@
 import socket
 import sys
 
-port = 5003
-
-
-def split_headers(res):
-    try:
-        res = res.decode('utf8')
-    except AttributeError:
-        pass
-    header = res.split('\r\n\r\n')[0]
-    if len(res.split('\r\n\r\n')) > 1:
-        body = res.split('\r\n\r\n')[1]
-    else:
-        body = ""
-    status = header.split('\r\n')[0]
-    header = header.split('\r\n')[1:]
-    headers_split = [h.split(':', 1) for h in header]
-    header_dict = {key.lower(): val.strip() for key, val in headers_split}
-    print('split headers returns: ', (status, header_dict, body))
-    return (status, header_dict, body)
-
 
 def make_GET(url):
     return 'GET / HTTP/1.1\r\nHost: ' + url + '\r\n\r\n'
@@ -35,7 +15,7 @@ def init_connection(ip, port):
 
 
 def send_msg():
-    client, stream_info = init_connection('127.0.0.1', port)
+    client, stream_info = init_connection('127.0.0.1', 5001)
     client.connect(stream_info[-1])
     client.sendall(make_GET('localhost:5001').encode('utf8'))
 
@@ -52,15 +32,8 @@ def send_msg():
 
     client.close()
     print('recv\'d: ', res)
-    split_headers(res)
     res = res.decode('utf8')
     return res
-
-
-def force_unicode(a_string, text_type):
-    if not isinstance(a_string, text_type):
-        return a_string.decode('utf-8')
-    return a_string
 
 
 def main():
@@ -68,7 +41,8 @@ def main():
         print(u'usage: python3 client.py')
         sys.exit(1)
     else:   # pragma: no cover
-        send_msg()
+        return send_msg()
+
 
 if __name__ == '__main__':  # pragma: no cover
     main()
