@@ -3,6 +3,7 @@ import socket
 import sys
 
 
+
 class HTTPException(Exception):
     def __init__(self, code, reason, htmlstring):
         self.code = code

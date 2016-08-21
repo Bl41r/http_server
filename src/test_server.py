@@ -6,9 +6,6 @@ from server import response_ok, response_error, parse_request, HTTPException
 MSG_TABLE = [
     ('HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\nIf you want my body and you think I\'m sexy come on sugar let me know\r\n\r\n')
 ]
-RES_TABLE = [
-    ('HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\nIf you want my body and you think I\'m sexy come on sugar let me know\r\n\r\n', ('HTTP/1.1 200 OK', {'content-type': 'text/plain'}, "If you want my body and you think I'm sexy come on sugar let me know"))
-]
 
 
 def test_parse_request():

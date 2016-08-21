@@ -17,7 +17,6 @@ def init_connection(ip, port):
 def send_msg():
     client, stream_info = init_connection('127.0.0.1', 5001)
     client.connect(stream_info[-1])
-
     client.sendall(make_GET('localhost:5001').encode('utf8'))
 
     client.shutdown(socket.SHUT_WR)
@@ -43,6 +42,7 @@ def main():
         sys.exit(1)
     else:   # pragma: no cover
         return send_msg()
+
 
 if __name__ == '__main__':  # pragma: no cover
     main()
