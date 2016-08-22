@@ -19,7 +19,8 @@ class HTTPException(Exception):
 
 
 def response_ok(uri):
-    tmp = "HTTP/1.1 200 OK\r\nContent-Type: {}\r\nContent-Size: {}\r\n\r\n{}\r\n\r\n".format(uri[0], uri[2], uri[1])
+    print('URI', uri)
+    tmp = "HTTP/1.1 200 OK\r\nContent-Type: {}\r\nContent-Size: {}\r\nHost: 127.0.0.1:5020\r\n\r\n{}\r\n\r\n".format(uri[0], uri[2], uri[1])
     return tmp.encode('utf8')
 
 
@@ -54,7 +55,7 @@ def parse_request(req):
 
 
 def sanitize_uri(parsed_uri):
-    parsed_uri = re.sub('\..', '', parsed_uri)
+    parsed_uri = re.sub('\.\.', '', parsed_uri)
     parsed_uri = re.sub('~', '', parsed_uri)
     return parsed_uri
 
@@ -73,17 +74,17 @@ def resolve_uri(parsed_uri):
     except IsADirectoryError:
         if os.path.exists(parsed_uri):
             filenames = os.listdir(parsed_uri)
-            body = '<html>\n'
+            body = ''
             for filename in filenames:
                 path = os.path.join(parsed_uri, filename)
                 body += "<h1>" + path + "</h1>\n"
-            body += '\n</html>'
+            body += '</html>'
             return ("text/directory", body, 0)
         else:
             raise IndexError("This directory does not exist.")
     except FileNotFoundError:
         if parsed_uri == "./webroot/favicon.ico":
-            return (" ", " ", 0)
+            return ("icon", "empty", 0)
         else:
             raise IndexError("The file you requested does not exist.")
     # update response ok function to accomplish this task

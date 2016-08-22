@@ -1,11 +1,24 @@
 # -*- coding: utf-8 -*-
 import pytest
 import client
-from server import response_ok, response_error, parse_request, HTTPException
+import mimetypes
+from server import response_ok, response_error, parse_request, HTTPException, resolve_uri, sanitize_uri
 
 MSG_TABLE = [
-    ('HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\nIf you want my body and you think I\'m sexy come on sugar let me know\r\n\r\n')
+    ('HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Size: 95\r\n\r\nThis is a very simple text file.\nJust to show that we can serve it up.\nIt is three lines long.\n\r\n\r\n')
 ]
+
+
+def test_sanitize_uri():
+    """Test substitution of ~ or .. for empty string"""
+    assert sanitize_uri('./webroot/..') == './webroot/'
+    assert sanitize_uri('./webroot/~') == './webroot/'
+
+
+def test_resolve_uri_404():
+    """Test returns file not found."""
+    with pytest.raises(IndexError):
+        resolve_uri('/fake.txt') == 'IndexError: The file you requested does not exist.'
 
 
 def test_parse_request():
@@ -15,7 +28,7 @@ def test_parse_request():
 
 def test_response_ok():
     """Test response_ok func."""
-    assert response_ok('test') == b"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\nIf you want my body and you think I'm sexy come on sugar let me know\r\n\r\n"
+    assert response_ok(('test', 'test', 'test')) == b"HTTP/1.1 200 OK\r\nContent-Type: test\r\nContent-Size: test\r\nHost: 127.0.0.1:5020\r\n\r\ntest\r\n\r\n"
 
 
 def test_response_error():
