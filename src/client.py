@@ -4,7 +4,7 @@ import sys
 
 
 def make_GET(url):
-    return 'GET / HTTP/1.1\r\nHost: ' + url + '\r\n\r\n'
+    return 'GET sample.txt HTTP/1.1\r\nHost: ' + url + '\r\n\r\n'
 
 
 def init_connection(ip, port):
@@ -15,7 +15,7 @@ def init_connection(ip, port):
 
 
 def send_msg():
-    client, stream_info = init_connection('127.0.0.1', 5001)
+    client, stream_info = init_connection('127.0.0.1', 5020)
     client.connect(stream_info[-1])
     client.sendall(make_GET('localhost:5001').encode('utf8'))
 
