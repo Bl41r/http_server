@@ -4,7 +4,7 @@ import sys
 import io
 import os
 import mimetypes
-
+import re
 
 
 class HTTPException(Exception):
@@ -21,6 +21,7 @@ class HTTPException(Exception):
 def response_ok(uri):
     tmp = "HTTP/1.1 200 OK\r\nContent-Type: {}\r\nContent-Size: {}\r\n\r\n{}\r\n\r\n".format(uri[0], uri[2], uri[1])
     return tmp.encode('utf8')
+
 
 def response_error(http_exception_inst):
     return http_exception_inst.as_response()
@@ -52,9 +53,16 @@ def parse_request(req):
     return uri
 
 
+def sanitize_uri(parsed_uri):
+    parsed_uri = re.sub('\..', '', parsed_uri)
+    parsed_uri = re.sub('~', '', parsed_uri)
+    return parsed_uri
+
+
 def resolve_uri(parsed_uri):
     root = u"./webroot"
     parsed_uri = root + parsed_uri
+    parsed_uri = sanitize_uri(parsed_uri)
     try:
         file_type = mimetypes.guess_type(parsed_uri)
         f = io.open(parsed_uri, encoding=file_type[1])
@@ -65,11 +73,12 @@ def resolve_uri(parsed_uri):
     except IsADirectoryError:
         if os.path.exists(parsed_uri):
             filenames = os.listdir(parsed_uri)
-            body = ''
+            body = '<html>\n'
             for filename in filenames:
                 path = os.path.join(parsed_uri, filename)
                 body += "<h1>" + path + "</h1>\n"
-            return ("text/directory", body)
+            body += '\n</html>'
+            return ("text/directory", body, 0)
         else:
             raise IndexError("This directory does not exist.")
     except FileNotFoundError:
