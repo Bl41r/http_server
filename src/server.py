@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 import socket
 import sys
-
+import io
+import os
+import mimetypes
+import re
 
 
 class HTTPException(Exception):
@@ -16,7 +19,9 @@ class HTTPException(Exception):
 
 
 def response_ok(uri):
-    return b"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\nIf you want my body and you think I'm sexy come on sugar let me know\r\n\r\n"
+    print('URI', uri)
+    tmp = "HTTP/1.1 200 OK\r\nContent-Type: {}\r\nContent-Size: {}\r\nHost: 127.0.0.1:5020\r\n\r\n{}\r\n\r\n".format(uri[0], uri[2], uri[1])
+    return tmp.encode('utf8')
 
 
 def response_error(http_exception_inst):
@@ -45,13 +50,49 @@ def parse_request(req):
     if "host" not in req_tuple[1]:
         raise HTTPException("417", "Expectation Failed", "<h1>Requires host header</h1>")
 
-    uri = req_tuple[0].split()[1]   # for clarity
+    uri = (req_tuple[0].split()[1])   # for clarity
     return uri
+
+
+def sanitize_uri(parsed_uri):
+    parsed_uri = re.sub('\.\.', '', parsed_uri)
+    parsed_uri = re.sub('~', '', parsed_uri)
+    return parsed_uri
+
+
+def resolve_uri(parsed_uri):
+    root = u"./webroot"
+    parsed_uri = root + parsed_uri
+    parsed_uri = sanitize_uri(parsed_uri)
+    try:
+        file_type = mimetypes.guess_type(parsed_uri)
+        f = io.open(parsed_uri, encoding=file_type[1])
+        body = f.read()
+        f.close()
+        file_size = os.path.getsize(parsed_uri)
+        return (file_type[0], body, file_size)
+    except IsADirectoryError:
+        if os.path.exists(parsed_uri):
+            filenames = os.listdir(parsed_uri)
+            body = ''
+            for filename in filenames:
+                path = os.path.join(parsed_uri, filename)
+                body += "<h1>" + path + "</h1>\n"
+            body += '</html>'
+            return ("text/directory", body, 0)
+        else:
+            raise IndexError("This directory does not exist.")
+    except FileNotFoundError:
+        if parsed_uri == "./webroot/favicon.ico":
+            return ("icon", "empty", 0)
+        else:
+            raise IndexError("The file you requested does not exist.")
+    # update response ok function to accomplish this task
 
 
 def server():
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM, socket.IPPROTO_TCP)
-    address = ('127.0.0.1', 5001)
+    address = ('127.0.0.1', 5020)
     server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     server.bind(address)
     server.listen(1)
@@ -71,7 +112,8 @@ def server():
             print('recvd:', msg)
             try:
                 uri = parse_request(msg)
-                conn.sendall(response_ok(uri))
+                resolved_uri = resolve_uri(uri)
+                conn.sendall(response_ok(resolved_uri))
             except HTTPException as e:
                 conn.sendall(response_error(e).encode('utf8'))
 
