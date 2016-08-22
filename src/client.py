@@ -11,14 +11,13 @@ def init_connection(ip, port):
     infos = socket.getaddrinfo(ip, port)
     stream_info = [i for i in infos if i[1] == socket.SOCK_STREAM][0]
     client = socket.socket(*stream_info[:3])
-    return client, stream_info
+    client.connect(stream_info[-1])
+    return client
 
 
 def send_msg():
-    client, stream_info = init_connection('127.0.0.1', 5001)
-    client.connect(stream_info[-1])
+    client = init_connection('127.0.0.1', 5001)
     client.sendall(make_GET('localhost:5001').encode('utf8'))
-
     client.shutdown(socket.SHUT_WR)
     reply_complete = False
     res = b''
