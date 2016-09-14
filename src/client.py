@@ -16,8 +16,8 @@ def init_connection(ip, port):
 
 
 def send_msg():
-    client = init_connection('127.0.0.1', 5020)
-    client.sendall(make_GET('localhost:5020').encode('utf8'))
+    client = init_connection('127.0.0.1', 10000)
+    client.sendall(make_GET('localhost:10000').encode('utf8'))
 
     client.shutdown(socket.SHUT_WR)
     reply_complete = False

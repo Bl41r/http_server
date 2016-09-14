@@ -2,7 +2,7 @@
 import pytest
 import client
 import mimetypes
-from server import response_ok, response_error, parse_request, HTTPException, resolve_uri, sanitize_uri
+from gevent_server import response_ok, response_error, parse_request, HTTPException, resolve_uri, sanitize_uri
 
 MSG_TABLE = [
     ('HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Size: 95\r\n\r\nThis is a very simple text file.\nJust to show that we can serve it up.\nIt is three lines long.\n\r\n\r\n')
