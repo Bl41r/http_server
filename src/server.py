@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
 import socket
 import sys
 import io
@@ -20,8 +21,14 @@ class HTTPException(Exception):
 
 def response_ok(uri):
     print('URI', uri)
-    tmp = "HTTP/1.1 200 OK\r\nContent-Type: {}\r\nContent-Size: {}\r\nHost: 127.0.0.1:5020\r\n\r\n{}\r\n\r\n".format(uri[0], uri[2], uri[1])
-    return tmp.encode('utf8')
+    uri0 = uri[0].encode('utf8')
+    try:
+        uri1 = uri[1].encode('utf8')
+    except (AttributeError, UnicodeDecodeError):
+        uri1 = uri[1]
+    uri2 = str(uri[2]).encode('utf8')
+    tmp = b"HTTP/1.1 200 OK\r\nContent-Type: " + uri0 + b"\r\nContent-Size: " + uri2 + b"\r\nHost: 127.0.0.1:5020\r\n\r\n" + uri1 + b"\r\n\r\n"
+    return tmp
 
 
 def response_error(http_exception_inst):
@@ -66,24 +73,24 @@ def resolve_uri(parsed_uri):
     parsed_uri = sanitize_uri(parsed_uri)
     try:
         file_type = mimetypes.guess_type(parsed_uri)
-        f = io.open(parsed_uri, encoding=file_type[1])
+        f = io.open(parsed_uri, 'rb')
         body = f.read()
         f.close()
         file_size = os.path.getsize(parsed_uri)
         return (file_type[0], body, file_size)
-    except IsADirectoryError:
-        if os.path.exists(parsed_uri):
+    except IOError:
+        if os.path.isdir(parsed_uri):
             filenames = os.listdir(parsed_uri)
-            body = ''
+            body = '<html>'
             for filename in filenames:
                 path = os.path.join(parsed_uri, filename)
                 body += "<h1>" + path + "</h1>\n"
             body += '</html>'
-            return ("text/directory", body, 0)
+            return ("text/html", body, 0)
         else:
             raise IndexError("This directory does not exist.")
-    except FileNotFoundError:
-        if parsed_uri == "./webroot/favicon.ico":
+    except IOError:
+        if parsed_uri == "favicon.ico":
             return ("icon", "empty", 0)
         else:
             raise IndexError("The file you requested does not exist.")
@@ -112,6 +119,7 @@ def server():
             print('recvd:', msg)
             try:
                 uri = parse_request(msg)
+                print(uri)
                 resolved_uri = resolve_uri(uri)
                 conn.sendall(response_ok(resolved_uri))
             except HTTPException as e:
