@@ -5,6 +5,8 @@ import io
 import os
 import mimetypes
 import re
+from gevent.server import StreamServer
+from gevent.monkey import patch_all
 
 
 class HTTPException(Exception):
@@ -137,9 +139,7 @@ def server(log_buffers=sys.stderr):
 
 
 if __name__ == '__main__':
-    from gevent.sever import StreamServer
-    from gevent.monkey import patch_all
     patch_all()
-    server = StreamServer(('127.0.0.1', 10000), echo)
+    server = StreamServer(('127.0.0.1', 10000), 'echo')
     print('Starting server on port 10000')
     server.serve_forever()

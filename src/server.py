@@ -96,7 +96,7 @@ def server():
     server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     server.bind(address)
     server.listen(1)
-
+    print('Server started on port 5020.')
     while True:
         try:
             conn, addr = server.accept()
