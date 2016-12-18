@@ -92,54 +92,27 @@ def resolve_uri(parsed_uri):
     # update response ok function to accomplish this task
 
 
-def server(log_buffers=sys.stderr):
-    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM, socket.IPPROTO_TCP)
-    address = ('127.0.0.1', 10000)
-    server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    server.bind(address)
-    server.listen(5)
+def ctrl_conn(conn, addr):
+    """Determine response logic."""
+
     buffsize = 16
-
-    input = [server_socket, sys.stdin]
-    running = True
-
-    while running:
-
-        read_ready, write_ready, except_ready = select.select(input, [], [], 0)
-
-        for readable in read_ready:
-
-            if readable is server_socket:
-                handler_socket, address = readable.accept()
-                input.append(handler_socket)
-
-            elif readable is sys.stdin:
-                sys.stdin.readline()
-                running = False
-
-            else:
-                message_complete = False
-                msg = ''
-                while not message_complete:
-                    data = readable.recv(buffsize)
-                    msg += data.decode('utf8')
-                    if len(data) < buffer_length or not data:
-                        message_complete = True
-                if message_complete:
-                        try:
-                            uri = parse_request(msg)
-                            resolved_uri = resolve_uri(uri)
-                            readable.sendall(response_ok(resolved_uri))
-                        except HTTPException as e:
-                            readable.sendall(response_error(e).encode('utf8'))
-                else:
-                    readable.close()
-                    input.remove(readable)
-    server_socket.close()
+    message_complete = False
+    msg = ''
+    while not message_complete:
+        data = conn.recv(buffsize)
+        msg += data.decode('utf8')
+        if len(data) < buffsize or not data:
+            message_complete = True
+    try:
+        uri = parse_request(msg)
+        resolved_uri = resolve_uri(uri)
+        conn.sendall(response_ok(resolved_uri))
+    except HTTPException as e:
+        conn.sendall(response_error(e).encode('utf8'))
+    conn.close()
 
 
 if __name__ == '__main__':
     patch_all()
-    server = StreamServer(('127.0.0.1', 10000), 'echo')
-    print('Starting server on port 10000')
-    server.serve_forever()
+    print('Starting server on port 10000!')
+    StreamServer(('127.0.0.1', 10000), ctrl_conn).serve_forever()
