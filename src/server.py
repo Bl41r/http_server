@@ -46,7 +46,7 @@ def parse_request(req):
     if req_tuple[0].split()[0] != "GET":
         raise HTTPException("405", "Method Not Allowed", "<h1>GET is the only method allowed</h1>")
     if req_tuple[0].split()[2] != "HTTP/1.1":
-        raise HTTPException("505", "HTTP Version Not Supported", "<h1>Fix yo shit</h1>")
+        raise HTTPException("505", "HTTP Version Not Supported", "<h1>Currently supports 1.1</h1>")
     if "host" not in req_tuple[1]:
         raise HTTPException("417", "Expectation Failed", "<h1>Requires host header</h1>")
 
